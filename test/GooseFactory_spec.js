@@ -6,16 +6,16 @@ import GooseFactory from '../src/';
 const always = true;
 
 const GOOSE_ACTIONS = {
-    perkele1: [ ["woop", "wheee", "satanperkele"],
-        function* ({woop, wheee, satanperkele}) { while (always) { yield "Awright"; } },
+    action1: [ ["woop", "wheee", "ohyeah"],
+        function* ({woop, wheee, ohyeah}) { while (always) { yield "Awright"; } },
     ],
-    perkele2: [ ["woop", "wheee", "sataniperkele"],
-        function* ({woop, wheee, sataniperkele}) { while (always) { yield "Awright"; } },
+    action2: [ ["woop", "wheee", "ohyeah"],
+        function* ({woop, wheee, ohyeah}) { while (always) { yield "Awright"; } },
     ],
-    perkele7: [ ["woop", "wheee", "satanperkele"],
-        function* ({woop, wheee, satanperkele}) {
+    action7: [ ["woop", "wheee", "ohyeah"],
+        function* ({woop, wheee, ohyeah}) {
             yield wheee;
-            yield satanperkele;
+            yield ohyeah;
             yield woop;
             yield "Awright";
         },
@@ -28,23 +28,23 @@ describe("GooseFactory", ()=> {
 
         describe("", ()=>{
             it("uses the actioncreator to create actions as expected, with arguments", ()=>{
-                const action = GOOSE_ACTIONS.perkele1(2, 42, 666);
+                const action = GOOSE_ACTIONS.action1(2, 42, 666);
                 expect(action).to.deep.equal({
-                    type: "GSTST_perkele1",
+                    type: "GSTST_action1",
                     woop: 2,
                     wheee: 42,
-                    satanperkele: 666,
+                    ohyeah: 666,
                 });
             });
 
 
             it("tolerates excessive number of action arguments, compared to the actionCreator actionArgumentNames", ()=>{
-                const action = GOOSE_ACTIONS.perkele2(2, 42, 99, 47, 101);
+                const action = GOOSE_ACTIONS.action2(2, 42, 99, 47, 101);
                 expect(action).to.deep.equal({
-                    type: "GSTST_perkele2",
+                    type: "GSTST_action2",
                     woop: 2,
                     wheee: 42,
-                    sataniperkele: 99,
+                    ohyeah: 99,
                 });
             });
         });
@@ -56,9 +56,9 @@ describe("GooseFactory", ()=> {
 
             // Exposes the saga generator, for testing. This is how to test it.
             it("returns the type of the actions it will create", ()=>{
-                const action = GOOSE_ACTIONS.perkele7("One", "Two", "Three");
+                const action = GOOSE_ACTIONS.action7("One", "Two", "Three");
 
-                const triggeredSaga = sagas.GSTST_perkele7(action);
+                const triggeredSaga = sagas.GSTST_action7(action);
 
                 expect(triggeredSaga.next().value).to.equal("Two");
                 expect(triggeredSaga.next().value).to.equal("Three");

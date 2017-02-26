@@ -14,32 +14,32 @@ describe("check", ()=>{
     // 2. the actionArgumentNames array doesn't contain the argument name 'type', which is reserved
         it("asserts the actionCreators during the creation", ()=> {
             expect(check(
-                "T_PERKELE1",
-                ["woop", "wheee", "satanperkele"],
+                "T_ACTION1",
+                ["woop", "wheee", "ohyeah"],
                 function*() { while(always) { yield "Awright"; } }
             )).to.equal(true);
 
 
 
             expect(check(
-                "T_PERKELE2",
-                ["woop", "wheee", "satanperkele"],
+                "T_ACTION2",
+                ["woop", "wheee", "ohyeah"],
                 function* (action){ while(always) { yield "Awright"; } }
             )).to.equal(true);
 
 
 
             expect(check(
-                "T_PERKELE3",
-                ["woop", "wheee", "satanperkele"],
-                function* ({woop, wheee, satanperkele}) { while(always) { yield "Awright"; } },
+                "T_ACTION3",
+                ["woop", "wheee", "ohyeah"],
+                function* ({woop, wheee, ohyeah}) { while(always) { yield "Awright"; } },
             )).to.equal(true);
 
             // It's happy as long as the reducers's action at least gets the arguments it needs
             expect(check(
-                "T_PERKELE4",
-                ["woop", "wheee", "satanperkele", "excessive", "superfluous", "redundant", "unused"],
-                function* ({woop, wheee, satanperkele}) { while(always) { yield "Awright"; } },
+                "T_ACTION4",
+                ["woop", "wheee", "ohyeah", "excessive", "superfluous", "redundant", "unused"],
+                function* ({woop, wheee, ohyeah}) { while(always) { yield "Awright"; } },
             )).to.equal(true);
         });
 
@@ -47,7 +47,7 @@ describe("check", ()=>{
         it("throws an error if the argument name list contains the name 'type', since that's reserved", ()=>{
             expect( ()=>{
                 check(
-                    "T_PERKELE13",
+                    "T_ACTION13",
                     ["woop", "good1", "type"],
                     function* ({woop, good1, type}){ while(always) { yield "Awright"; } }
                 );
@@ -103,38 +103,38 @@ describe("check", ()=>{
 
         it("throws an error on duplicate actionTypes between this duck/goose or any other", ()=> {
             expect( ()=>check(
-                "T_PERKELE14",
-                ["woop", "wheee", "satanperkele"],
+                "T_ACTION14",
+                ["woop", "wheee", "ohyeah"],
                 function*() { while(always) { yield "Awright"; } }
             )).to.not.throw(Error);
 
             expect( ()=>check(
-                "WHOOPSIE",
-                ["woop", "wheee", "satanperkele"],
+                "WHOOPS",
+                ["woop", "wheee", "ohyeah"],
                 function*() { while(always) { yield "Awright"; } }
             )).to.not.throw(Error);
 
             expect( ()=>check(
-                "T_PERKELE15",
-                ["woop", "wheee", "satanperkele"],
+                "T_ACTION15",
+                ["woop", "wheee", "ohyeah"],
                 function*() { while(always) { yield "Awright"; } }
             )).to.not.throw(Error);
 
             expect( ()=>check(
-                "WHOOPSIE",
-                ["woop", "wheee", "satanperkele"],
+                "WHOOPS",
+                ["woop", "wheee", "ohyeah"],
                 function*() { while(always) { yield "Awright"; } }
             )).to.throw(Error);
 
             expect( ()=>check(
-                "T_PERKELE16",
-                ["woop", "wheee", "satanperkele"],
+                "T_ACTION16",
+                ["woop", "wheee", "ohyeah"],
                 function*() { while(always) { yield "Awright"; } }
             )).to.not.throw(Error);
 
             expect( ()=>check(
-                "T_PERKELE16",
-                ["woop", "wheee", "satanperkele"],
+                "T_ACTION16",
+                ["woop", "wheee", "ohyeah"],
                 function*() { while(always) { yield "Awright"; } }
             )).to.throw(Error);
         });
