@@ -1,2 +1,2 @@
 # goosefactory
-Factory for the redux-saga analogy to a redux duck: a 'goose'
+Factory for simple creation and use of 'geese' - the redux-saga analogy to redux ducks.
