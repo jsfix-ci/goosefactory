@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import GooseFactory from '../../../src/redux/duckfactory/GooseFactory';
+import GooseFactory from '../src/';
 
 
 const always = true;

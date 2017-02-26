@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import check from '../../../src/redux/duckfactory/check';
+import check from '../src/check';
 
 const always = true;
 
