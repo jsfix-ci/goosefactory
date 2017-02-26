@@ -23,8 +23,6 @@ const checkActionArgumentNames = (actionArgumentNames, actionType) => {
 };
 
 
-// The action can have arguments that the reducer doesn't use. But the action must have all arguments
-// that the reducer uses!
 export default (actionType, actionArgumentNames = [], func) => {
     let healthy = true;
 

@@ -3,16 +3,16 @@ import check from './check';
 
 import functionArgNames from './functionArgNames';
 
-const getSagaArgNames = (func, actionType) => {
-    if (func != null) {
-        const reducerArgs = functionArgNames.getArgs(func);
+const getSagaArgNames = (sagaReducer, actionType) => {
+    if (sagaReducer != null) {
+        const reducerArgs = functionArgNames.getArgs(sagaReducer);
 
         if (reducerArgs.length > 0) {
             const firstArg = reducerArgs[0];
             if (firstArg.substr(0, 4) === "_ref") {
-                const refArgs = functionArgNames.getRefs(func, firstArg);
+                const refArgs = functionArgNames.getRefs(sagaReducer, firstArg);
                 if (refArgs == null) {
-                    console.warn("Possibly flawed action '" + actionType +
+                    console.warn("Possible flaw in goose action '" + actionType +
                         "': the saga generator expects a deconstructed object ( e.g. {name1, name2, name3} ) as its " +
                         "first argument, but this seems empty");
 
@@ -20,8 +20,8 @@ const getSagaArgNames = (func, actionType) => {
                 return refArgs || [];
 
             } else if (firstArg !== "action") {
-                console.warn("Possibly flawed reducer for action " + actionType +
-                    ": the saga generator expected 'action' as the name of its first argument");
+                console.warn("Possible flaw in goose action '" + actionType +
+                    "': the saga generator expected 'action' as the name of its first argument");
                 return [];
             }
         }
@@ -29,11 +29,11 @@ const getSagaArgNames = (func, actionType) => {
 };
 
 /**
- *  Creates a action-actioncreator-rootsaga unified complex: a goose?
+ *  Creates an action-actioncreator-rootsaga unified complex: a... goose, I guess.
  */
 class GooseFactory {
-    constructor(actionPrefix, actionAndSagaMapOrMaps, checkAndWarn = true, defaultSagaEffect = takeEvery) {
-        this._prefix = actionPrefix;
+    constructor(actionTypePrefix, actionAndSagaMapOrMaps, checkAndWarn = true, defaultSagaEffect = takeEvery) {
+        this._prefix = actionTypePrefix;
         this._sagaTable = {};
         this._takeEffectTable = {};
         this._actionNum = 0;
