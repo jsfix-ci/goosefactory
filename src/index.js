@@ -123,7 +123,7 @@ class GooseFactory {
         }
 
         const [actionCreatorMap, sagaMap, typeMap, takeEffectMap] = buildMaps(
-            actionTypePrefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, logBuilt && window.console);
+            actionTypePrefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, logBuilt && window && window.console);
 
         this._actionCreatorMap = actionCreatorMap;      // actionCreatorName    --> actionCreatorFunction
         this._sagaMap = sagaMap;                        // actionType           --> sagaGenerator
