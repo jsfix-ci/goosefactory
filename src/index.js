@@ -141,19 +141,19 @@ class GooseFactory {
     getTypes() { return this._typeMap; }
     getTakeEffects() { return this._takeEffectMap; }
 
-    static createRootSaga(sagaMapArray, mergedTakeEffectMap) {
-        let take;
-        function* rootSaga() {
-            for (let sagaTable of sagaMapArray) {
-                for (let key of Object.keys(sagaTable)) {
-                    take = mergedTakeEffectMap[key];
-                    yield take(key, sagaTable[key]);
-                }
-            }
-        }
-        return rootSaga;
-    }
 }
 
-
 export default GooseFactory;
+
+export const createRootSaga = (sagaMapArray, mergedTakeEffectMap) => {
+    let take;
+    function* rootSaga() {
+        for (let sagaTable of sagaMapArray) {
+            for (let key of Object.keys(sagaTable)) {
+                take = mergedTakeEffectMap[key];
+                yield take(key, sagaTable[key]);
+            }
+        }
+    }
+    return rootSaga;
+};
