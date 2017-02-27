@@ -7,8 +7,8 @@ const checkActionName = actionName => {
             "Only strings or numbers are allowed.");
     }
     if (takenActionNames.has(actionName)) {
-        throw Error("Action name " + JSON.stringify(actionName) + " is already taken. Action names must be unique. " +
-            "Existing names are: " + JSON.stringify(takenActionNames));
+        throw Error("Action name " + JSON.stringify(actionName) + " is already taken. Action types " +
+            "(prefix + action name) must be unique. Existing names are: " + JSON.stringify(takenActionNames));
     }
     takenActionNames.add(actionName);
 };
@@ -43,7 +43,6 @@ export default (actionType, actionArgumentNames = [], func) => {
                     healthy = false;
 
                 }
-
             }
         }
     }

@@ -1,6 +1,6 @@
 {
   "name": "goosefactory",
-  "version": "1.0.2",
+  "version": "1.1.1",
   "description": "Factory for creating the redux-saga analogy to a redux duck: a goose",
   "main": "lib/index.js",
   "scripts": {
@@ -34,6 +34,7 @@
     "chai": "3.5.0",
     "eslint": "3.14.0",
     "eslint-plugin-react": "^6.10.0",
+    "jsdom": "^9.11.0",
     "mocha": "3.2.0",
     "rimraf": "^2.6.1"
   }

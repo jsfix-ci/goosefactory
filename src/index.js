@@ -15,45 +15,74 @@ const getActionType = (prefix, actionName) =>
     actionName);
 
 
-const makeActionCreator = (actionType, actionArgumentNames = []) => (...args) => {
+const makeActionCreator = (actionType, actionArgumentNames = [], logBuilt) => (...args) => {
     const action = {type: actionType};
     actionArgumentNames.forEach( (key, idx) => { action[key] = args[idx]; } );
-    console.log("New reducer action:", action);
+
+    if (logBuilt) { console.log("New saga action:", action); }
+
     return action;
 };
 
-
-
-const buildMaps = (prefix, actionAndReducerMap, checkAndWarn, logBuilt) => {
+const buildMaps = (prefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, logBuilt) => {
     const actionCreatorMap = {};
-    const reducerMap = {};
+    const sagaMap = {};
     const typeMap = {};
+    const takeEffectMap = {};
 
-    Object.keys(actionAndReducerMap).forEach( actionName => {
+    Object.keys(actionAndSagaMap).forEach( actionName => {
 
         const actionType = getActionType(prefix, actionName);
-        let reducerFunction = actionAndReducerMap[actionName];
-        const actionArgumentNames = getSagaArgNames(reducerFunction, actionType) || [];
+
+        const [sagaGenerator, takeEffect] = getSagaAndTakeEffect(actionAndSagaMap, actionName, defaultTakeEffect);
+
+        const actionArgumentNames = getSagaArgNames(sagaGenerator, actionType) || [];
 
         if (checkAndWarn) {
-            check(actionType, actionArgumentNames, reducerFunction);
+            check(actionType, actionArgumentNames, sagaGenerator);
         }
 
-        actionCreatorMap[actionName] = makeActionCreator(actionType, actionArgumentNames);
-        reducerMap[actionType] = reducerFunction;
+        actionCreatorMap[actionName] = makeActionCreator(actionType, actionArgumentNames, logBuilt);
+        sagaMap[actionType] = sagaGenerator;
+        takeEffectMap[actionType] = takeEffect;
         typeMap[actionName] = actionType;
 
-        if (logBuilt && window.console) {
-            console.log("\nActionCreator: getActionCreators()." + actionName + "(" + actionArgumentNames.join(", ") + ")");
-            console.log("\tType: getTypes()." + actionName + " = '" + actionType + "'");
+        if (logBuilt) {
+            console.log("\nActionCreator: " + actionName + "(" + actionArgumentNames.join(", ") + ")   --->   type: '" + actionType + "'");
         }
     });
 
-    return [actionCreatorMap, reducerMap, typeMap];
+    return [actionCreatorMap, sagaMap, typeMap, takeEffectMap];
 };
 
 
 // -------------------------------------------------------------  Saga-specific helpers
+
+const getSagaAndTakeEffect = (actionAndSagaMap, actionName, defaultTakeEffect) => {
+    let value = actionAndSagaMap[actionName];
+
+    if (value == null) {
+        return;
+    }
+
+    let sagaGenerator;
+    let takeEffect;
+
+    if ((typeof value) === 'function') {
+        takeEffect = defaultTakeEffect;
+        sagaGenerator = value;
+
+    } else if (Array.isArray(value)) {
+        takeEffect = value[0];
+        sagaGenerator = value[1];
+
+    } else if ((typeof value) === 'object') {
+        takeEffect = value["takeEffect"];
+        sagaGenerator = value["saga"];
+    }
+
+    return [sagaGenerator, takeEffect];
+};
 
 const getSagaArgNames = (sagaReducer, actionType) => {
     if (sagaReducer != null) {
@@ -88,128 +117,36 @@ const getSagaArgNames = (sagaReducer, actionType) => {
  *  Creates an action-actioncreator-rootsaga unified complex: a... goose, I guess.
  */
 class GooseFactory {
-    constructor(actionAndSagaMaps, defaultSagaEffect = takeEvery, checkAndWarn = true, logBuilt = false) {
-
-
-        /*
-
-
-        constructor(actionTypePrefix, initialState, actionAndReducerMap, checkAndWarn = true) {
-            if (actionAndReducerMap == null || (typeof actionAndReducerMap !== 'object')) {
-                throw Error("Can't create a duck without actionAndReducerMap: action creator name --> reducer function");
-            }
-            if (!Array.isArray(actionAndSagaMapOrMaps)) {
-                actionAndSagaMapOrMaps = [actionAndSagaMapOrMaps];
-            }
-
-            actionAndSagaMapOrMaps.forEach(actionAndSagaMap => {
-                this._mutateActionAndSagaMap(actionAndSagaMap);
-            });
-
-
-            const [actionCreatorMap, sagaMap, typeMap] = buildMaps(
-                actionTypePrefix, actionAndReducerMap, checkAndWarn, logBuilt);
-
-            this._actionCreators = actionCreatorMap;
-            this._rootSaga = makeReducer(sagaMap, initialState);
-            this._types = typeMap;
-
-            this.getRootSaga = this.getRootSaga.bind(this);
-            this.getActionCreators = this.getActionCreators.bind(this);
-            this.getTypes = this.getTypes.bind(this);
+    constructor(actionTypePrefix, actionAndSagaMap, defaultTakeEffect = takeEvery, checkAndWarn = true, logBuilt = false) {
+        if (actionAndSagaMap == null || (typeof actionAndSagaMap !== 'object')) {
+            throw Error("Can't create a goose without actionAndSagaMap: action creator name --> saga generator");
         }
 
-        getRootSaga() { return this._rootSaga; }
-        getActionCreators() { return this._actionCreators; }
-        getTypes() { return this._types; }
+        const [actionCreatorMap, sagaMap, typeMap, takeEffectMap] = buildMaps(
+            actionTypePrefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, logBuilt && window.console);
 
-        //*/
+        this._actionCreatorMap = actionCreatorMap;      // actionCreatorName    --> actionCreatorFunction
+        this._sagaMap = sagaMap;                        // actionType           --> sagaGenerator
+        this._typeMap = typeMap;                        // actionCreatorName    --> actionType
+        this._takeEffectMap = takeEffectMap;            // actionType           --> takeEffect
 
-
-
-        this._prefix = actionTypePrefix;
-        this._sagaTable = {};
-        this._takeEffectTable = {};
-        this._actionNum = 0;
-        this._checkAndWarn = checkAndWarn;
-        this._defaultSagaEffect = defaultSagaEffect;
-
-        this.createRootSaga = this.createRootSaga.bind(this);
         this.getSagas = this.getSagas.bind(this);
-        this._makeActionCreator = this._makeActionCreator.bind(this);
-        this._mutateActionAndSagaMap = this._mutateActionAndSagaMap.bind(this);
-
-
+        this.getActionCreators = this.getActionCreators.bind(this);
+        this.getTypes = this.getTypes.bind(this);
+        this.getTakeEffects = this.getTakeEffects.bind(this);
     }
 
-    _mutateActionAndSagaMap(actionAndSagaMap) {
-        Object.keys(actionAndSagaMap).forEach( actionName => {
-            let value = actionAndSagaMap[actionName];
-
-            if (value == null) {
-                return;
-            }
-
-            let sagaGenerator;
-            let takeEffect;
-
-            if ((typeof value) === 'function') {
-                takeEffect = this._defaultSagaEffect;
-                sagaGenerator = value;
-
-            } else if (Array.isArray(value)) {
-                takeEffect = value[0];
-                sagaGenerator = value[1];
-
-            } else if ((typeof value) === 'object') {
-                takeEffect = value["takeEffect"];
-                sagaGenerator = value["saga"];
-            }
-
-            const actionArgumentNames = getSagaArgNames(sagaGenerator, actionName);
-
-            actionAndSagaMap[actionName] = this._makeActionCreator(
-                actionName, actionArgumentNames, takeEffect, sagaGenerator);
-        });
-    }
-
-    _makeActionCreator(actionName, actionArgumentNames = [], takeEffect, sagaGenerator) {
-        const actionType = this._prefix + "_" + ((actionName == null || actionName === "") ?
-                "" + (this._actionNum++) :
-                actionName);
-
-        if (this._checkAndWarn) {
-            check(actionType, actionArgumentNames, sagaGenerator, false);
-        }
-
-
-        const actionCreator = (...args) => {
-            const action = {type: actionType};
-
-            actionArgumentNames.forEach( (argName, i) => { action[argName] = args[i]; } );
-            console.log("Created new saga action:", action);
-            return action;
-        };
-
-
-        this._sagaTable[actionType] = sagaGenerator;
-        this._takeEffectTable[actionType] = takeEffect;
-
-        console.log("\nSaga actionCreator:", actionName + "(" + actionArgumentNames.join(", ") + ")");
-        console.log("\t---> Action type: " + actionType);
-
-        return actionCreator;
-    }
-
-    getSagaTable() { return this._sagaTable; }
-    getTakeEffectTable() { return this._takeEffectTable; }
+    getSagas() { return this._sagaMap; }
+    getActionCreators() { return this._actionCreatorMap; }
+    getTypes() { return this._typeMap; }
+    getTakeEffects() { return this._takeEffectMap; }
 }
-GooseFactory.createRootSaga = (sagaTableArray, takeEffectTable) => {
+GooseFactory.createRootSaga = (sagaMapArray, mergedTakeEffectMap) => {
     let take;
     function* rootSaga() {
-        for (let sagaTable of sagaTableArray) {
+        for (let sagaTable of sagaMapArray) {
             for (let key of Object.keys(sagaTable)) {
-                take = takeEffectTable[key];
+                take = mergedTakeEffectMap[key];
                 yield take(key, sagaTable[key]);
             }
         }
