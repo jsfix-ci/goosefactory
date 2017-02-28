@@ -1,17 +1,33 @@
 import { expect } from 'chai';
-//import { takeLatest } from 'redux-saga';
+import { takeLatest } from 'redux-saga';
 
-import GooseFactory from '../src/';
+import GooseFactory, { createRootSaga } from '../lib/';
 
 
 const GOOSE_ACTIONS = {
-    woopOnce: function* ({woop}) { yield woop; },
-    awrightTwice: function* () { yield "Awright then"; yield "Awright now"; },
+    woopOnce: function* ({woop}) { console.log("woopOnce"); yield woop; },
+    awrightTwice: function* () { console.log("awrightTwice"); yield "Awright then"; yield "Awright now"; },
     twoThreeOneAwright: function* ({one, two, three}) {
+        console.log("twoThreeOneAwright");
         yield two;
         yield three;
         yield one;
         yield "Awright";
+    },
+};
+const MORE_ACTIONS = {
+    stuff: function* ({stuffed}) { console.log("stuff"); yield "Something :" + stuffed; },
+    more: function* ({even, more}) { console.log("more"); yield more; yield even; yield "Okay, I'm done.";},
+};
+
+/* Demonstrates two optional ways to individually override the default rootSaga takeEffect. Note the named functions. */
+const REPLACED_TAKEEFFECTS = {
+    dvno: [takeLatest, function* dvno() { console.log("DVNO"); yield "DVNO"; }],
+    fourCap: {
+        takeEffect: takeLatest,
+        saga: function* fourCap() {
+            console.log("FourCapitalLetters"); yield "FourCapitalLetters";
+        },
     },
 };
 
@@ -43,7 +59,6 @@ describe("GooseFactory", ()=> {
         });
     });
 
-
     describe(".getTypes", ()=> {
         it("exposes the action type associated with each of the goose's action creator names", ()=>{
             const gooseFactory = new GooseFactory("goose/test2/", GOOSE_ACTIONS, undefined, true, true);
@@ -56,33 +71,6 @@ describe("GooseFactory", ()=> {
         });
     });
 
-    /*describe(".getTakeEffects", ()=>{
-        it("exposes the redux-saga effect (or other take-actiontype-and-yield-generator-able function)" +
-           "associated with each of the goose's action types", ()=>{
-
-            // undefined means use takeEvery as takeEffect
-            const gooseFactory1 = new GooseFactory("goose/takeEvery/", GOOSE_ACTIONS, undefined, true, true);
-
-            const takeEffects1 = gooseFactory1.getTakeEffects();
-            Object.keys(takeEffects1).forEach( key => {
-                console.log("type:", key, "--- effect:", takeEffects1[key]);
-            });
-
-
-            // Checks a replaced default effect
-            const gooseFactory2 = new GooseFactory("goose/takeLatest/", GOOSE_ACTIONS, takeLatest, true, true);
-
-            const takeEffects2 = gooseFactory2.getTakeEffects();
-            Object.keys(takeEffects2).forEach( key => {
-                console.log("type:", key, "--- effect:", takeEffects2[key]);
-            });
-
-            // TODO: Can takeEvery and takeLatest be separated? Or used like this at all?
-        });
-    });*/
-
-
-    // .
     describe(".getSagas", ()=>{
         it("exposes a map from each actionType to the saga it will trigger", ()=>{
             const gooseFactory = new GooseFactory("goose/test3/", GOOSE_ACTIONS, undefined, true, true);
@@ -119,6 +107,41 @@ describe("GooseFactory", ()=> {
             const dn3 = twoThreeOneAwrightGen.next();
             expect(dn3.value).to.equal(undefined);
             expect(dn3.done).to.equal(true);
+        });
+    });
+
+
+    describe("createRootSaga", ()=>{
+        it("takes an array of gooseFactories and creates one rootSaga, with overrideable rootSaga takeEffects", ()=>{
+            const gooseFactory = new GooseFactory(
+                "goose/test4/",
+                GOOSE_ACTIONS,
+                undefined, // Default takeEffect: takeEvery
+                true, true);
+            const moreFactory = new GooseFactory(
+                "goose/test5/",
+                MORE_ACTIONS,
+                takeLatest, // Overrides default takeEffect for this whole gooseFactory: takeLatest
+                true, true);
+            const replacedTakeEffects = new GooseFactory(
+                "goose/test6/",
+                REPLACED_TAKEEFFECTS,
+                undefined, // No new default here, but has takeEffect overrides for each action in REPLACED_TAKEEFFECTS
+                true, true);
+
+            const rootSaga = createRootSaga([gooseFactory, moreFactory, replacedTakeEffects]);
+            const rootGen = rootSaga();
+
+            expect(rootGen.next().value.name).to.equal('takeEvery(goose/test4/woopOnce, woopOnce)');
+            expect(rootGen.next().value.name).to.equal('takeEvery(goose/test4/awrightTwice, awrightTwice)');
+            expect(rootGen.next().value.name).to.equal('takeEvery(goose/test4/twoThreeOneAwright, twoThreeOneAwright)');
+            expect(rootGen.next().value.name).to.equal('takeLatest(goose/test5/stuff, stuff)');
+            expect(rootGen.next().value.name).to.equal('takeLatest(goose/test5/more, more)');
+            expect(rootGen.next().value.name).to.equal('takeLatest(goose/test6/dvno, dvno)');
+            expect(rootGen.next().value.name).to.equal('takeLatest(goose/test6/fourCap, fourCap)');
+            const dn = rootGen.next();
+            expect(dn.value).to.equal(undefined);
+            expect(dn.done).to.equal(true);
         });
     });
 });

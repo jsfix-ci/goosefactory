@@ -34,16 +34,16 @@ const buildMaps = (prefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, lo
 
         const actionType = getActionType(prefix, actionName);
 
-        const [sagaGenerator, takeEffect] = getSagaAndTakeEffect(actionAndSagaMap, actionName, defaultTakeEffect);
+        const [saga, takeEffect] = getSagaAndTakeEffect(actionAndSagaMap, actionName, defaultTakeEffect);
 
-        const actionArgumentNames = getSagaArgNames(sagaGenerator, actionType) || [];
+        const actionArgumentNames = getSagaArgNames(saga, actionType) || [];
 
         if (checkAndWarn) {
-            check(actionType, actionArgumentNames, sagaGenerator);
+            check(actionType, actionArgumentNames, saga);
         }
 
         actionCreatorMap[actionName] = makeActionCreator(actionType, actionArgumentNames, logBuilt);
-        sagaMap[actionType] = sagaGenerator;
+        sagaMap[actionType] = saga;
         takeEffectMap[actionType] = takeEffect;
         typeMap[actionName] = actionType;
 
@@ -65,23 +65,23 @@ const getSagaAndTakeEffect = (actionAndSagaMap, actionName, defaultTakeEffect) =
         return;
     }
 
-    let sagaGenerator;
+    let saga;
     let takeEffect;
 
     if ((typeof value) === 'function') {
         takeEffect = defaultTakeEffect;
-        sagaGenerator = value;
+        saga = value;
 
     } else if (Array.isArray(value)) {
         takeEffect = value[0];
-        sagaGenerator = value[1];
+        saga = value[1];
 
     } else if ((typeof value) === 'object') {
         takeEffect = value["takeEffect"];
-        sagaGenerator = value["saga"];
+        saga = value["saga"];
     }
 
-    return [sagaGenerator, takeEffect];
+    return [saga, takeEffect];
 };
 
 const getSagaArgNames = (sagaReducer, actionType) => {
@@ -145,13 +145,15 @@ class GooseFactory {
 
 export default GooseFactory;
 
-export const createRootSaga = (sagaMapArray, mergedTakeEffectMap) => {
-    let take;
+export const createRootSaga = (gooseArray) => {
+    let takeEffect, sagaMap, takeEffectMap;
     function* rootSaga() {
-        for (let sagaTable of sagaMapArray) {
-            for (let key of Object.keys(sagaTable)) {
-                take = mergedTakeEffectMap[key];
-                yield take(key, sagaTable[key]);
+        for (let goose of gooseArray) {
+            sagaMap = goose.getSagas();
+            takeEffectMap = goose.getTakeEffects();
+            for (let actionType of Object.keys(sagaMap)) {
+                takeEffect = takeEffectMap[actionType];
+                yield takeEffect(actionType, sagaMap[actionType]);
             }
         }
     }
