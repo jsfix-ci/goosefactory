@@ -4,17 +4,23 @@
 ### Why?
 <a href="https://github.com/reactjs/redux">Redux</a> / <a href="https://github.com/reactjs/react-redux">react redux</a> are great, but it can produce a lot of boilerplate and fragmented code as a project grows, even for simple functionality. The concept of <a href="https://github.com/erikras/ducks-modular-redux">redux ducks</a> aims to simplify and structure this, in a great way in my humble opinion: bundle the reducers with the actions that they belong to (which in most cases are, or should be, a one-to-one relationship).
 
-<a href="https://github.com/redux-saga/redux-saga">React-sagas</a> can be used pretty similarly in structure: action creators create actions with action types that trigger sagas. So far I haven't come across anything that helps to simplify this in the same way as ducks, though.
+<a href="https://github.com/redux-saga/redux-saga">React-sagas</a> can be used pretty similarly in structure: action creators create actions, with action types, that trigger sagas. So far I haven't come across anything that helps to simplify this in the same way as ducks.
 
 So here's taking a stab at it: the redux-sagas version of <a href="https://github.com/espen42/duckfactory">Duckfactory</a> (a sibling library made for bundling reducers instead of sagas).
  
-### "Goose", really?
-Ducks are named after the last syllable of "redux". "Goose" seems like a logical suggestion for the sagas parallel, since it's a little bit similar to the last syllable in "sagas", and a little bit similar to a duck. I'm open to other suggestions if you can think of a better name. 
+### What? "Goose"?
+Ducks are named after the last syllable of "redux". "Goose" seems like the obvious suggestion for the sagas parallel - it's a little bit similar to the last syllable in "sagas", and a little bit similar to a duck. Suggestions are welcome if you can think of a better name. 
 
-You can't, though.
+Bet you can't, though.
 
-### Okay, I'm super convinced! How do I use it?
+### Where?
 
+##### npm install goosefactory
+...or
+##### yarn add goosefactory
+
+
+### How?
 Give it a prefix string to group the actions, an object with the names of action creators and the sagas the actions should trigger, and it will create an object that exposes ordinary redux action creators, saga generators and action types:
 
 
