@@ -3,6 +3,7 @@ import check from './check';
 
 import functionArgNames from './functionArgNames';
 
+const canLog = window && window.console;
 
 // --------------------------------------------------------------------  General helpers
 
@@ -19,7 +20,9 @@ const makeActionCreator = (actionType, actionArgumentNames = [], logBuilt) => (.
     const action = {type: actionType};
     actionArgumentNames.forEach( (key, idx) => { action[key] = args[idx]; } );
 
-    if (logBuilt) { console.log("New saga action:", action); }
+    if (logBuilt) {
+        console.log("New saga action:", action);
+    }
 
     return action;
 };
@@ -123,7 +126,7 @@ class GooseFactory {
         }
 
         const [actionCreatorMap, sagaMap, typeMap, takeEffectMap] = buildMaps(
-            actionTypePrefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, logBuilt && window && window.console);
+            actionTypePrefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, logBuilt && canLog);
 
         this._actionCreatorMap = actionCreatorMap;      // actionCreatorName    --> actionCreatorFunction
         this._sagaMap = sagaMap;                        // actionType           --> sagaGenerator
