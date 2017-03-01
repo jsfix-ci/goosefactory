@@ -8,12 +8,31 @@ const canLog = window && window.console;
 // --------------------------------------------------------------------  General helpers
 
 
+const buildPrefix = prefix => {
+    if (prefix != null && (typeof prefix) !== 'string') {
+        throw Error("Prefix must be null/undefined, or a string");
+    }
+
+    if (prefix == null || (prefix === "") || (prefix === "/")) {
+        return "";
+    }
+
+    if (prefix.slice(-1) === '/') {
+        return prefix;
+    }
+
+    return prefix + "/";
+};
+
+
 let actionNum = 0;
 const getActionType = (prefix, actionName) =>
-(prefix != null ? prefix : "") +
+buildPrefix(prefix) +
 ((actionName == null || actionName === "") ?
     "" + (actionNum++) :
     actionName);
+
+
 
 
 const makeActionCreator = (actionType, actionArgumentNames = [], logBuilt) => (...args) => {
@@ -51,7 +70,7 @@ const buildMaps = (prefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, lo
         typeMap[actionName] = actionType;
 
         if (logBuilt) {
-            console.log("\nSaga actionCreator: " + actionName + "(" + actionArgumentNames.join(", ") + ")   " +
+            console.log("Saga actionCreator: " + actionName + "(" + actionArgumentNames.join(", ") + ")   " +
                 "--->   type: '" + actionType + "'");
         }
     });

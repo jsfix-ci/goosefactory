@@ -31,7 +31,7 @@ const REPLACED_TAKEEFFECTS = {
     },
 };
 
-describe("GooseFactory", ()=> {
+describe("goosefactory", ()=> {
     describe(".getActionCreators", ()=> {
         it("exposes an object with actions creators, corresponding to the keys in the object sent to the creator, " +
             "where the actioncreator's arguments are the saga generator's deconstructed action arguments", () => {
@@ -68,6 +68,117 @@ describe("GooseFactory", ()=> {
             expect(types.woopOnce = 'goose/test2/woopOnce');
             expect(types.awrightTwice = 'goose/test2/awrightTwice');
             expect(types.twoThreeOneAwright = 'goose/test2/twoThreeOneAwright');
+        });
+
+        it("makes sure the actiontype is sensible if prefix is null", ()=>{
+            const gooseFactory = new GooseFactory(null, {
+                global1: function*({woop}) {
+                    console.log("woopOnce");
+                    yield woop;
+                },
+            }, undefined, true, true);
+
+            const types = gooseFactory.getTypes();
+            expect(types.global1).to.equal("global1");
+        });
+
+        it("makes sure the actiontype is sensible if prefix is en empty string", ()=>{
+            const gooseFactory = new GooseFactory("", {
+                global2: function*({woop}) {
+                    console.log("woopOnce");
+                    yield woop;
+                },
+            }, undefined, true, true);
+
+            const types = gooseFactory.getTypes();
+            expect(types.global2).to.equal("global2");
+        });
+
+        it("makes sure the actiontype doesn't end up containing a double slash if prefix ends with a slash", ()=>{
+            const gooseFactory = new GooseFactory("hey/", {
+                ya: function*({woop}) {
+                    console.log("woopOnce");
+                    yield woop;
+                },
+            }, undefined, true, true);
+
+            const types = gooseFactory.getTypes();
+            expect(types.ya).to.equal("hey/ya");
+        });
+
+        it("makes sure the actiontype is sensible even if prefix is only a slash", ()=>{
+            const gooseFactory = new GooseFactory("/", {
+                global3: function*({woop}) {
+                    console.log("woopOnce");
+                    yield woop;
+                },
+            }, undefined, true, true);
+
+            const types = gooseFactory.getTypes();
+            expect(types.global3).to.equal("global3");
+        });
+
+        it("rejects non-string prefixes (other than null/undefined)", ()=>{
+            expect( ()=>{
+                new GooseFactory({thisIs: "wrong"}, {
+                    ya: function*({woop}) {
+                        console.log("woopOnce");
+                        yield woop;
+                    },
+                }, undefined, true, true);
+            }).to.throw(Error);
+
+            expect( ()=>{
+                new GooseFactory(["also", "bad"], {
+                    ya: function*({woop}) {
+                        console.log("woopOnce");
+                        yield woop;
+                    },
+                }, undefined, true, true);
+            }).to.throw(Error);
+
+            expect( ()=>{
+                new GooseFactory(840, {
+                    ya: function*({woop}) {
+                        console.log("woopOnce");
+                        yield woop;
+                    },
+                }, undefined, true, true);
+            }).to.throw(Error);
+
+        });
+
+        it("throws an error if all produced action types are not globally unique, " +
+            "even across different duckfactories", ()=>{
+            expect( ()=>{
+                new GooseFactory("this/is", {
+                    unique: function*({woop}) { console.log("woopOnce"); yield woop; },
+                }, undefined, true, true);
+
+                new GooseFactory("this/is", {
+                    okay: function*({woop}) { console.log("woopOnce"); yield woop; },
+                }, undefined, true, true);
+
+                new GooseFactory("this/is/also", {
+                    unique: function*({woop}) { console.log("woopOnce"); yield woop; },
+                }, undefined, true, true);
+
+                new GooseFactory("this/is/also", {
+                    okay: function*({woop}) { console.log("woopOnce"); yield woop; },
+                }, undefined, true, true);
+
+                new GooseFactory("this/is", {
+                    notUnique: function*({woop}) { console.log("woopOnce"); yield woop; },
+                }, undefined, true, true);
+
+            }).to.not.throw(Error);
+
+            expect( ()=>{
+                new GooseFactory("this/is", {
+                    notUnique: function*({woop}) { console.log("woopOnce"); yield woop; },
+                }, undefined, true, true);
+
+            }).to.throw(Error);
         });
     });
 
@@ -109,7 +220,6 @@ describe("GooseFactory", ()=> {
             expect(dn3.done).to.equal(true);
         });
     });
-
 
     describe("createRootSaga", ()=>{
         it("takes an array of gooseFactories and creates one rootSaga, with overrideable rootSaga takeEffects", ()=>{
