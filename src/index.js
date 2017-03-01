@@ -51,7 +51,8 @@ const buildMaps = (prefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, lo
         typeMap[actionName] = actionType;
 
         if (logBuilt) {
-            console.log("\nActionCreator: " + actionName + "(" + actionArgumentNames.join(", ") + ")   --->   type: '" + actionType + "'");
+            console.log("\nSaga actionCreator: " + actionName + "(" + actionArgumentNames.join(", ") + ")   " +
+                "--->   type: '" + actionType + "'");
         }
     });
 
