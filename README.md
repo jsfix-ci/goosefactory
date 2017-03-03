@@ -1,14 +1,13 @@
 # Goosefactory
 **Simple creation and use of 'geese' - the redux-saga analogy to redux ducks.**
 
-## Why?
 [Redux](https://github.com/reactjs/redux) / [react redux](https://github.com/reactjs/react-redux) are great, but it can produce a lot of boilerplate and fragmented code as a project grows, even for simple functionality. The concept of [redux ducks](https://github.com/erikras/ducks-modular-redux) aims to simplify and structure this, in a great way in my humble opinion: bundle the reducers with the actions that they belong to (which in most cases are, or should be, a one-to-one relationship).
 
 [React-sagas](https://github.com/redux-saga/redux-saga) can be used pretty similarly in structure: action creators create actions, with action types, that trigger sagas. So far I haven't come across anything that helps to simplify this in the same way as ducks.
 
 So here's taking a stab at it: the redux-sagas version of [Duckfactory](https://github.com/espen42/duckfactory) (a sibling library made for bundling reducers instead of sagas).
  
-## What's a "goose"?
+## What's a goose?
 Ducks are named after the last syllable of "redux". "Goose" seems like the obvious suggestion for the sagas parallel - it's a little bit similar to the last syllable in "sagas", and a little bit similar to a duck. Suggestions are welcome if you can think of a better name. 
 
 Bet you can't, though.
