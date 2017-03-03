@@ -2,7 +2,7 @@
 **Simple creation and use of 'geese' - the redux-saga analogy to redux ducks.**
 
 ## Why?
-[Redux](a href="https://github.com/reactjs/redux) / [react redux](https://github.com/reactjs/react-redux) are great, but it can produce a lot of boilerplate and fragmented code as a project grows, even for simple functionality. The concept of [redux ducks](https://github.com/erikras/ducks-modular-redux) aims to simplify and structure this, in a great way in my humble opinion: bundle the reducers with the actions that they belong to (which in most cases are, or should be, a one-to-one relationship).
+[Redux](https://github.com/reactjs/redux) / [react redux](https://github.com/reactjs/react-redux) are great, but it can produce a lot of boilerplate and fragmented code as a project grows, even for simple functionality. The concept of [redux ducks](https://github.com/erikras/ducks-modular-redux) aims to simplify and structure this, in a great way in my humble opinion: bundle the reducers with the actions that they belong to (which in most cases are, or should be, a one-to-one relationship).
 
 [React-sagas](https://github.com/redux-saga/redux-saga) can be used pretty similarly in structure: action creators create actions, with action types, that trigger sagas. So far I haven't come across anything that helps to simplify this in the same way as ducks.
 

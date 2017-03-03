@@ -1,6 +1,6 @@
 {
   "name": "goosefactory",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Factory for creating the redux-saga analogy to a redux duck: a goose",
   "main": "lib/index.js",
   "scripts": {
