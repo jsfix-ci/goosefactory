@@ -92,16 +92,13 @@ dispatch(actionCreators.fetchUser(183482374, false));
 #### Creating a root saga
  
 In order to use the actions like this, the sagas must be hooked up to the redux-sagas middleware in the ordinary way. To create a root saga for that, use the named export `createRootSaga`, it takes as argument an array of created geese and returns one rootSaga covering all of them.
-```ecmascript 6
+```
 import { createRootSaga } from 'gooseFactory';
 
 const rootSaga = createRootSaga([userGoose, anotherGoose]);
 ```
  
 
-
- 
- 
 #### More about the constructor:
 - `actionTypePrefix`: prefix string that is prepended before the action types. Must be globally unique, inside the same global namespace as all other goosefactories (AND duckfactories if you use them together). This way, they can share a redux dispatcher.
 
