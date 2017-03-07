@@ -107,14 +107,14 @@ const getSagaAndTakeEffect = (actionAndSagaMap, actionName, defaultTakeEffect) =
     return [saga, takeEffect];
 };
 
-const getSagaArgNames = (sagaReducer, actionType) => {
-    if (sagaReducer != null) {
-        const reducerArgs = functionArgNames.getArgs(sagaReducer);
+const getSagaArgNames = (saga, actionType) => {
+    if (saga != null) {
+        const reducerArgs = functionArgNames.getArgs(saga);
 
         if (reducerArgs.length > 0) {
             const firstArg = reducerArgs[0];
             if (firstArg.substr(0, 4) === "_ref") {
-                const refArgs = functionArgNames.getRefs(sagaReducer, firstArg);
+                const refArgs = functionArgNames.getRefs(saga, firstArg);
                 if (refArgs == null) {
                     console.warn("Possible flaw in goose action '" + actionType +
                         "': the saga generator expects a deconstructed object ( e.g. {name1, name2, name3} ) as its " +
