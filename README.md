@@ -37,9 +37,9 @@ yarn add goosefactory
 ## How does it work?
 Short version: give it a prefix string to group the actions, an object with the names of action creators and the sagas the actions should trigger, and it will create an object that exposes ordinary redux action creators, saga generators and action types:
 
-#### Defining a goose
+### Defining a goose
 
-```
+```javascript
 import { put, call } from 'redux-sagas';
 import GooseFactory from 'duckfactory';
 
@@ -67,7 +67,7 @@ const actionCreators = userGoose.getActionCreators();
 
 This will construct a goose bundle with the two sagas `listUsers` and `fetchUser`. Also, `actionCreators` now exposes two action creators that triggers one saga each. These manually written action creators _would be_ identical:
 
-```
+```javascript
 const listUsers = (nameSearchString) => ({
    type: "users/listUsers",
    nameSearchString: nameSearchString
@@ -80,26 +80,28 @@ const fetchUser = (userId, isAdmin) => ({
 });
 ```
 
-Instead, just use the generated action creators directly:
+**Don't do that.** Instead, just use the generated action creators directly:
 
-```
+```javascript
 dispatch(actionCreators.listUsers("arthur"));
 dispatch(actionCreators.fetchUser(183482374, false));
 ```
 
+No need to think about the action creators or types beyond this, although they are available if you want them - more about that below.
  
  
-#### Creating a root saga
+### Creating a root saga
  
 In order to use the actions like this, the sagas must be hooked up to the redux-sagas middleware in the ordinary way. To create a root saga for that, use the named export `createRootSaga`, it takes as argument an array of created geese and returns one rootSaga covering all of them.
-```
+```javascript
 import { createRootSaga } from 'gooseFactory';
 
 const rootSaga = createRootSaga([userGoose, anotherGoose]);
 ```
  
 
-#### More about the constructor:
+## A bit more info
+### More about the constructor:
 - `actionTypePrefix`: prefix string that is prepended before the action types. Must be globally unique, inside the same global namespace as all other goosefactories (AND duckfactories if you use them together). This way, they can share a redux dispatcher.
 
 - `actionAndSagaMap`: an object where the keys become the names of action creators, and the values are EITHER: 
@@ -112,7 +114,7 @@ const rootSaga = createRootSaga([userGoose, anotherGoose]);
 - `logBuilt`: A last option boolean (default: false) set sets whether to log some details when an action creator is produced, and when it creates actions. Handy for development, no need for it in prod.
 
 
-#### More about what it exposes after creation:
+### More about what it exposes after creation:
 
 The resulting goose exports as maps (regular JS objects):
 - `.getActionCreators()`: actionCreator-name → actionCreator-function
