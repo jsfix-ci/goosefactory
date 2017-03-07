@@ -39,7 +39,7 @@ Short version: give it a prefix string to group the actions, an object with the 
 
 #### Defining a goose
 
-```ecmascript 6
+```
 import { put, call } from 'redux-sagas';
 import GooseFactory from 'duckfactory';
 
@@ -67,7 +67,7 @@ const actionCreators = userGoose.getActionCreators();
 
 This will construct a goose bundle with the two sagas `listUsers` and `fetchUser`. Also, `actionCreators` now exposes two action creators that triggers one saga each. These manually written action creators _would be_ identical:
 
-```ecmascript 6
+```
 const listUsers = (nameSearchString) => ({
    type: "users/listUsers",
    nameSearchString: nameSearchString
@@ -82,7 +82,7 @@ const fetchUser = (userId, isAdmin) => ({
 
 Instead, just use the generated action creators directly:
 
-```ecmascript 6
+```
 dispatch(actionCreators.listUsers("arthur"));
 dispatch(actionCreators.fetchUser(183482374, false));
 ```
