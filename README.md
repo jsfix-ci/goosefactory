@@ -3,9 +3,9 @@
 
 [Redux](https://github.com/reactjs/redux) / [react redux](https://github.com/reactjs/react-redux) are pretty great.
 
-Boilerplate code ensues. Things easily get more messy and complex and fragmented than what seems justifiable. I share the impression that there tends to be a one-to-one (-to-one) relationship between action creators, action types and reducers in the majority of cases. [Redux ducks](https://github.com/erikras/ducks-modular-redux) is an interesting proposal for making the code easier to organize and handle in those cases. 
+But suddenly: boilerplate and messiness. Things can get more cumbersome and complex and fragmented than what seems justifiable, even though there tends to be a one-to-one (-to-one) relationship between action creators, action types and reducers in the majority of cases. [Redux ducks](https://github.com/erikras/ducks-modular-redux) is an interesting proposal for making the code easier to organize and handle in those cases. 
 
-I currently enjoy getting into combining redux with [react-sagas](https://github.com/redux-saga/redux-saga). I have the same impression here: it seems the most tidy way to do it is to make sure one action creator creates actions of one type, which triggers one single saga. 
+I currently enjoy getting into combining redux with [react-sagas](https://github.com/redux-saga/redux-saga). I have the same impression here: it seems the most tidy way to do it is to make sure one action creator creates actions of one type, which triggers one single saga.
  
 
 
