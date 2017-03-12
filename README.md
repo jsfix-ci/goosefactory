@@ -1,6 +1,14 @@
 # Goosefactory
 **Simple creation and use of 'geese' - a redux-saga analogy to redux ducks.**
 
+---
+
+**IMPORTANT: A bad bug has been discovered! It causes a problem (loss of action creator arguments) when goosefactory is used in projects that use code mangling (code minification / uglification) for production with tools like webpack.**
+
+I'm currently working on this and will release a bugfix version when it's solved. **Until then I don't recommend using goosefactory (version 1.2.7 or below) or duckfactory (v1.2.6 or below) with production-mangled code.**
+
+---
+
 [Redux](https://github.com/reactjs/redux) / [react redux](https://github.com/reactjs/react-redux) are pretty great.
 
 But suddenly: boilerplate and messiness. Things can get more cumbersome and complex and fragmented than what seems justifiable, even though there tends to be a one-to-one (-to-one) relationship between action creators, action types and reducers in the majority of cases. [Redux ducks](https://github.com/erikras/ducks-modular-redux) is an interesting proposal for making the code easier to organize and handle in those cases. 
