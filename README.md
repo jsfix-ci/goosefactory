@@ -3,7 +3,8 @@
 
 ---
 
-**IMPORTANT: A bad bug has been discovered! It causes a problem (loss of action creator arguments) when goosefactory is used in projects that use code mangling (code minification / uglification) for production with tools like webpack.**
+## IMPORTANT: 
+**A nasty bug has been discovered!** It causes a problem (loss of action creator arguments) when goosefactory is used in projects that use code mangling (code minification / uglification) for production with tools like webpack.
 
 I'm currently working on this and will release a bugfix version when it's solved. **Until then I don't recommend using goosefactory (version 1.2.7 or below) or duckfactory (v1.2.6 or below) with production-mangled code.**
 
