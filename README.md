@@ -1,11 +1,3 @@
-## IMPORTANT: 
-**A naughty bug has been discovered!** It causes a problem (loss of action creator arguments) when goosefactory is used in projects that use code mangling (code minification / uglification) for production with tools like webpack.
-
-I'm currently working on this and will release a bugfix version when it's solved. **Until then I don't recommend using goosefactory (version 1.2.7 or below) or duckfactory (v1.2.6 or below) with production-mangled code.**
-
-
----
-
 # Goosefactory
 **Simple creation and use of 'geese' - a redux-saga analogy to redux ducks.**
 
@@ -40,7 +32,8 @@ npm install --save goosefactory
 yarn add goosefactory
 ```
 
-**Also note!** Although it's not an explicit npm dependency, goosefactory uses [ES6 object destructuring](https://hacks.mozilla.org/2015/05/es6-in-depth-destructuring/) in the saga generator parameters. 
+
+**NOTE:** if your app uses minification/uglification, version 1.3.0 should be okay, but don't use the versions below. 
 
 ## How does it work?
 Short version: give it a prefix string to group the actions, an object with the names of action creators and the sagas the actions should trigger, and it will create an object that exposes ordinary redux action creators, saga generators and action types:
