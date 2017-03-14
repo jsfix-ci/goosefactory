@@ -1,7 +1,7 @@
 import { takeEvery } from 'redux-saga';
 import check from './check';
 
-import functionArgNames from './functionArgNames';
+import getActionFields from './actionFields';
 
 const canLog = window && window.console;
 
@@ -58,19 +58,19 @@ const buildMaps = (prefix, actionAndSagaMap, defaultTakeEffect, checkAndWarn, lo
 
         const [saga, takeEffect] = getSagaAndTakeEffect(actionAndSagaMap, actionName, defaultTakeEffect);
 
-        const actionArgumentNames = getSagaArgNames(saga, actionType) || [];
+        const actionFields = getSagaActionFields(saga, actionType);
 
         if (checkAndWarn) {
-            check(actionType, actionArgumentNames, saga);
+            check(saga, actionType, actionFields);
         }
 
-        actionCreatorMap[actionName] = makeActionCreator(actionType, actionArgumentNames, logBuilt);
+        actionCreatorMap[actionName] = makeActionCreator(actionType, actionFields, logBuilt);
         sagaMap[actionType] = saga;
         takeEffectMap[actionType] = takeEffect;
         typeMap[actionName] = actionType;
 
         if (logBuilt) {
-            console.log("Saga actionCreator: " + actionName + "(" + actionArgumentNames.join(", ") + ")   " +
+            console.log("Saga actionCreator: " + actionName + "(" + actionFields.join(", ") + ")   " +
                 "--->   type: '" + actionType + "'");
         }
     });
@@ -107,29 +107,10 @@ const getSagaAndTakeEffect = (actionAndSagaMap, actionName, defaultTakeEffect) =
     return [saga, takeEffect];
 };
 
-const getSagaArgNames = (saga, actionType) => {
-    if (saga != null) {
-        const reducerArgs = functionArgNames.getArgs(saga);
-
-        if (reducerArgs.length > 0) {
-            const firstArg = reducerArgs[0];
-            if (firstArg.substr(0, 4) === "_ref") {
-                const refArgs = functionArgNames.getRefs(saga, firstArg);
-                if (refArgs == null) {
-                    console.warn("Possible flaw in goose action '" + actionType +
-                        "': the saga generator expects a deconstructed object ( e.g. {name1, name2, name3} ) as its " +
-                        "first argument, but this seems empty");
-
-                }
-                return refArgs || [];
-
-            } else if (firstArg !== "action") {
-                console.warn("Possible flaw in goose action '" + actionType +
-                    "': the saga generator expected 'action' as the name of its first argument");
-                return [];
-            }
-        }
-    }
+const getSagaActionFields = (saga) => {
+    return (saga != null) ?
+        getActionFields(saga) || [] :
+        [];
 };
 
 
