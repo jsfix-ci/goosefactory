@@ -102,7 +102,7 @@ Note that the fields `nameSearchString`, `userId` and `isAdmin` are the names de
 These actions are ready to dispatch, and will trigger the sagas as in regular redux-sagas. 
 
  
-### Creating a root saga
+### Hooking it up: creating a root saga
  
 In order to use the actions like this, the sagas must be hooked up to the redux-sagas middleware in the ordinary way. To create a root saga for that, use the named export `createRootSaga`: it takes as argument an array of created goose collections and returns one rootSaga covering all of them.
 
