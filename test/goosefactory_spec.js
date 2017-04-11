@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { takeLatest } from 'redux-saga';
+import deepFreeze from 'deep-freeze';
 
 import GooseFactory, { createRootSaga } from '../lib/';
 
@@ -56,6 +57,33 @@ describe("goosefactory", ()=> {
                 two: 42,
                 three: 777,
             });
+        });
+
+
+        it("...and each action creator produces new action objects in each call (doesn't recycle objects)", ()=>{
+            const gooseFactory = new GooseFactory("goose/testUnique/", GOOSE_ACTIONS, undefined, true, true);
+            const actions = gooseFactory.getActionCreators();
+
+            // Expect the value of the first action object to not be affected by the creation of the second:
+            const ac1 = deepFreeze(actions.woopOnce(1));
+            const ac2 = deepFreeze(actions.woopOnce(4));
+            expect(ac1.woop).to.equal(1);
+            expect(ac2.woop).to.equal(4);
+
+            // Uniqueness even applies to argument-less actions (and in a different way than a clone):
+            const ac3 = deepFreeze(actions.awrightTwice());
+            const ac3b = ac3;
+            const ac4 = deepFreeze(actions.awrightTwice());
+            expect(ac3b).to.equal(ac3);
+            expect(ac3).to.not.equal(ac4);
+
+            // All values behave as expected, and independently:
+            const ac5 = deepFreeze(actions.twoThreeOneAwright(10,20,30));
+            const ac6 = deepFreeze(actions.twoThreeOneAwright(15,20,35));
+            expect(ac5.type).to.equal(ac6.type);
+            expect(ac5.one).to.not.equal(ac6.one);
+            expect(ac5.two).to.equal(ac6.two);
+            expect(ac5.three).to.not.equal(ac6.three);
         });
     });
 
